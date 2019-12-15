@@ -1,0 +1,130 @@
+* {
+    margin: 0;
+    padding: 0;
+    list-style: none
+}
+.control {
+    width: 1000px;
+    height: 150px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 10px;
+    border: 1px solid silver;
+    border-radius: 2px;
+}
+.control .configure {
+    width: 300px;
+    height: 150px;
+    float: left;
+}
+.control .configure div{
+    margin-top: 5px;
+    height: 40px;
+    line-height: 40px;
+}
+.control .configure div span {
+    font-size: 25px;
+    font-weight: 700;
+    margin-left: 10px;
+}
+.control .configure div input {
+    width: 100px;    
+    font-size: 20px;
+    text-align: center;
+}
+.control .dis {
+    position: absolute;
+    width: 300px;
+    left: 50%;
+    margin-left: -150px;
+}
+.control .dis button {
+    position: absolute;
+    width: 200px;
+    height: 80px;
+    border-radius: 40px;
+    outline: 0px;
+    font-size: 35px;
+    font-weight: 700;
+    border: 1px solid silver;
+    margin-top: 10px;
+    margin-left: -100px;
+    left: 50%;
+}
+.control .dis button#again{
+    display: none;
+    
+}
+
+.control .dis span {
+    position: relative;
+    top: 110px;
+    display: inline-block;
+    font-weight: 600;   
+    padding: 5px 10px;
+    border-radius: 5px;
+    
+}
+.control .dis span.lei{
+    background: red;
+    float: left;
+    margin-left: 30px;
+}
+.control .dis span.save{
+    background: greenyellow;
+    margin-left: 20px;
+}
+.control .dis span.flag{
+    background: yellow;
+    float: right;
+    margin-right: 30px;
+    
+}
+.control .sore {
+    width: 300px;
+    float: right;
+}
+.control .sore .time {
+    font-size: 40px;
+    margin-top: 30px;
+}
+.control .sore .residual {
+    font-size: 20px;
+    margin-top: 30px;
+    margin-left: 20px;
+}
+
+#mysaolei {
+    /* width: 50%; */
+    /* height: 200px; */
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 20px;
+    border: 1px solid silver;
+    border-radius: 2px;
+    margin-bottom: 30px;
+}
+#mysaolei div {
+    position: absolute;
+    width: 23px;
+    height: 23px;
+    line-height: 23px;
+    font-size: 16px;
+    text-align: center;
+    border: 1px solid silver;
+    border-radius: 2px;
+}
+#mysaolei div.lei{
+    background: red;
+}
+#mysaolei div.save{
+    background: greenyellow;
+}
+#mysaolei div.flag{
+    background: yellow;
+    
+}
+
+css
