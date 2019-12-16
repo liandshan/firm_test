@@ -1,0 +1,32 @@
+<h1>New Order</h1>
+
+<form action="/orders" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="✓"><input type="hidden" name="authenticity_token" value="qsUcvcjRXGy3c6cWXLtTFzMngSuTeEMNUSieDA+toHmMT3oikEyp55rSusrSNpiEg4pDIuLqC+pkz669N6bsng==">
+
+  <div class="field">
+    <label for="order_user_id">用户名:</label>
+    <%= select_tag "user_id", options_for_select([["选中用户", nil]]+@users, params[:user_id].to_i) -%>
+  </div>
+
+  <div class="field">
+    <label for="order_product_id">商品名称:</label>
+    <%= select_tag "product_id", options_for_select([["选中用户", nil]]+@products, params[:product_id].to_i) -%>
+  </div>
+
+  <div class="field">
+    <label for="order_num">数量:</label>
+    <%= select_tag "num", options_for_select(1..10, params[:num].to_i) -%>
+  </div>
+
+  <div class="field">
+    <label for="order_batch_id">Batch</label>
+     <%= text_field_tag "batch_id", params[:batch_id] -%>
+  </div>
+
+  <div class="actions">
+    <input type="submit" name="commit" value="Create Order" data-disable-with="Create Order">
+  </div>
+</form>
+
+<%# <%= render 'form', order: @order %> %>
+
+<%= link_to 'Back', orders_path %>

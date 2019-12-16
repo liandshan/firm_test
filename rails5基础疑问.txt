@@ -1,0 +1,44 @@
+1.rails new 名字   #初始化一个rails项目
+2.更改gem源 http://gems.ruby-china.com/
+  bundle install  #安装gems
+3.脚手架快速生成rails generate scaffold User name:string email:string
+4.执行迁移，创建表rails db:migrate
+
+
+
+
+
+【疑问】
+4.model关系
+has_many :job_title_roles, class_name: 'Right::JobTitleRole', as: :roleable has_many :roles, through: :job_title_roles, source: :role
+
+9.前端页面erb实现下拉列表,已经创建new/脚本添加数据
+10.call_back
+13.controller中添加方法,统计所有商品销售总额
+
+一个用户：多个订单；订单只属于一个用户，是一种产品
+一个产品多个订单
+
+  @reports = BidDevelopReport.all(:select => "cutoff_id, ability_score, quality_score, total_score, employee_id", :conditions => ['cutoff_id in(?)', @cutoffs.map(&:cutoff_id)], :order => 'total_score desc').group_by(&:employee_id)
+    
+[解决]
+1.迁移文件添加索引:t.belongs_to :right_function, index: true,comment: '功能id'
+(??模型中设置belongs_to,迁移文件也需要改为belongs_to吗)
+5.当删除用户后，同步删除所有订单:删除关联对象has_many :comments, dependent: :destroy
+6.scope需要调用一下：苹果用引号吗(hash)
+7.定义?函数
+8.订单价格浮点与integer可以相加吗:可以
+9.vip用户添加到常量能不是hash
+
+10前端下拉列表值
+@editors = Employee.all.map { |emp| [emp['username'], emp['id']] }
+转移人：
+<%= select_tag "remove[remove_by_eq]", options_for_select([["请选择", nil]]+@editors, params[:remove][:remove_by_eq].to_i) -%>
+
+11.跑脚本(5以上是rake文件,以下才是rb文件)
+   $ruby script/runner script/2018.rb  #rails是5一下
+   在lib/下创建rake:在项目下跑命令$ rake auth:add(其中namespace :auth,task add:)
+12.self调用的是类方法,belong_to里的是实例方法!!!!!
+   join联合表查询
+13.其中12,13题没做
+
