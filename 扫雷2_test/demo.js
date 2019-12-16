@@ -59,7 +59,7 @@ window.onload = function(){
         row =  row_v.value || 10;
         lei_n =  lei_v.value || 10;
         if((col * row) < lei_n){
-            alert("你TM要这么多雷炸死谁！ 格子都放不下了！赶紧少放点雷！");
+            alert("雷太多了，格子放不下了！");
             return false;            
         }
         this.style.display = "none";
@@ -72,7 +72,7 @@ window.onload = function(){
         row =  row_v.value || 10;
         lei_n =  lei_v.value || 10;
         if((col * row) < lei_n){
-            alert("你TM要这么多雷炸死谁！ 格子都放不下了！赶紧少放点雷！");
+            alert("雷太多了，格子放不下了！");
             return false;            
         }
         map = [];
@@ -247,5 +247,3 @@ window.onload = function(){
         },500)
     }  
 }
-
-JavaScript

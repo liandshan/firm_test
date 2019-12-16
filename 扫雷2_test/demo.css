@@ -72,7 +72,7 @@
     margin-left: 30px;
 }
 .control .dis span.save{
-    background: greenyellow;
+    background: lightblue;
     margin-left: 20px;
 }
 .control .dis span.flag{
@@ -113,18 +113,16 @@
     line-height: 23px;
     font-size: 16px;
     text-align: center;
-    border: 1px solid silver;
+    border: 1px solid black;
     border-radius: 2px;
 }
 #mysaolei div.lei{
     background: red;
 }
 #mysaolei div.save{
-    background: greenyellow;
+    background: lightblue;
 }
 #mysaolei div.flag{
     background: yellow;
     
 }
-
-css
