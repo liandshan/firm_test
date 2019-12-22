@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>扫雷游戏</title>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+    <script src='main.js'></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="left">
+                行数:<input id="rowNum" style="width: 100px;" placeholder="默认为10" value=""><br>
+                列数:<input id="columnNum" style="width: 100px;" placeholder="默认为10" value=""><br>
+                雷数:<input id="thunderNum" style="width: 100px;" placeholder="默认为10" value=""><br>
+            </div>
+            <div class="center" style="float: inherit;">
+                <button type="submit" onclick="startGame()">开始游戏</button>
+            </div>
+            <div class="right" sty>
+                时间<span id="time"></span><br>
+                剩余雷数<span id="thunderLeft"></span>
+            </div>
+        </div>
+        <div class="content">
+            <div class="table" id="table">
+                <!-- 2行3列 -->
+                <table>
+                    <tr>
+                        <td id="colCon">123</td>
+                        <td>2</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<style>
+    .header {
+        border: 1px solid;
+        margin: 30px 50px;
+        position: relative;
+        height: 100px;
+    }
+
+    .left {
+        font-weight: 1000;
+        float: left;
+        margin: 15px 25px;
+    }
+
+    .center {
+        color: red;
+        left: 50%;
+        position: absolute;
+        margin-top: 10px;
+    }
+
+    .right {
+        float: right;
+        margin-right: 200px;
+        margin-top: 20px;
+    }
+
+    .content {
+        border: 1px solid gray;
+        padding: 10px 10px;
+        width: max-content;
+        left: 50%;
+        position: relative;
+    }
+
+    .table tr td {
+        border: 1px solid black;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        background-color: green;
+    }
+</style>
+
+<script>
+    // 1.时间计时器
+    // 2.随机插入雷
+    // 3.点击随机点亮一些表格
+    // 4.展现雷数
+    // 5.标记雷
+    function startGame() {
+        let  showCon=$("#colCon").text();
+        alert(showCon);
+        // alert("游戏开始");
+        $("#colCon").text("sdd");
+        // createTable();
+        // addThunder();
+    }
+    // 输入框输入内容合理否的校验
+    function createTable() {
+        let rows = $("#rowNum").val();
+        let cols = $("#columnNum").val();
+        let tableHtml = "<table>";
+        for (i = 0; i < rows; i++) {
+            tableHtml += "<tr id='row" + i + "'>";
+            for (j = 0; j < cols; j++) {
+                tableHtml += "<td id='col" +i+j + "'></td>";
+            }
+            tableHtml += "</tr>";
+        }
+        tableHtml += "</table>";
+        $("#table").html("").append(tableHtml);
+    }
+    function addThunder() {
+        let thunders=$("thunderNum").val();
+        for (i = 0; i < thunders; i++) {
+          $("col00").append(i);
+        }
+    }
+</script>
+
+</html>
