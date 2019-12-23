@@ -28,19 +28,22 @@
             </div>
         </div>
         <div class="content">
+
             <div class="table" id="table">
                 <!-- 2行3列 -->
                 <table>
-                    <tr>
-                        <td id="colCon">123</td>
-                        <td>2</td>
-                        <td>3</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <td id="colCon">123</td>
+                            <td>2</td>
+                            <td>3</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -88,6 +91,18 @@
         text-align: center;
         background-color: green;
     }
+
+    .table tr td.lei {
+        background-color: red;
+    }
+
+    .table tr td.flag {
+        background-color: yellow;
+    }
+
+    .table tr td.safe {
+        background-color: white;
+    }
 </style>
 
 <script>
@@ -96,34 +111,128 @@
     // 3.点击随机点亮一些表格
     // 4.展现雷数
     // 5.标记雷
+    var rows = $("#rowNum").val() || 10; //行数
+    var cols = $("#columnNum").val() || 10;//列数
+    var thunders = $("#thunderNum").val() || 10;//雷数
+    var array = []; //数组元素
+    // $(document).ready(function () {
+    //     var setTime = setInterval(function () {
+    //         useTime += 0.5;
+    //         time.innerHTML = parseInt(useTime) + 's';
+    //     }, 500)
+   
+    // });
     function startGame() {
-        let  showCon=$("#colCon").text();
-        alert(showCon);
-        // alert("游戏开始");
-        $("#colCon").text("sdd");
-        // createTable();
-        // addThunder();
+        alert("游戏开始");
+        createTable();
+        addThunder();
+        console.log($("#table td"));
     }
     // 输入框输入内容合理否的校验
     function createTable() {
-        let rows = $("#rowNum").val();
-        let cols = $("#columnNum").val();
+        $("#table").bind("contextmenu", function () { return false; }) //先要屏蔽浏览器默认的右键点击行为，即阻止弹出框。
         let tableHtml = "<table>";
         for (i = 0; i < rows; i++) {
-            tableHtml += "<tr id='row" + i + "'>";
+            tableHtml += "<tr>";
+            array[i] = [];
             for (j = 0; j < cols; j++) {
-                tableHtml += "<td id='col" +i+j + "'></td>";
+                tableHtml += "<td></td>";
+                array[i][j] = { 'x': i, 'y': j, 'num': 0, 'flag': false, 'lei': false };
             }
             tableHtml += "</tr>";
         }
         tableHtml += "</table>";
         $("#table").html("").append(tableHtml);
+        click();//每个单元格添加鼠标点击事件
     }
+
+    // 埋雷
     function addThunder() {
-        let thunders=$("thunderNum").val();
-        for (i = 0; i < thunders; i++) {
-          $("col00").append(i);
+        alert("埋雷");
+        let i = 0;
+        while (i < thunders) {
+            var arrayx = parseInt(Math.random() * rows);   // 生成[0,max]的随机数  
+            var arrayy = parseInt(Math.random() * cols);
+            if (array[arrayx][arrayy].lei) { //有雷
+                return
+            } else {
+                array[arrayx][arrayy].lei = true;
+                i++;
+            }
+            // $("#col" + arrayx[i] +""+ arrayy[i]).text("sdd");
         }
+    }
+
+    // 统计雷数
+    function countThunder() {
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                if (map[i][j].lei) {
+                    if (map[i - 1]) { //上
+                        if (map[i - 1][j - 1] && map[i - 1][j - 1].lei) map[i - 1][j - 1].num++;
+                        if (map[i - 1][j] && map[i - 1][j].lei) map[i - 1][j].num++;
+                        if (map[i - 1][j + 1] && map[i - 1][j + 1].lei) map[i - 1][j + 1].num++;
+                    }
+                    if (map[i]) {
+                        if (map[i][j - 1] && map[i][j - 1].lei) map[i][j - 1].num++;
+                        if (map[i][j + 1] && map[i][j + 1].lei) map[i][j + 1].num++;
+                    }
+                    if (map[i + 1]) { //下
+                        if (map[i + 1][j - 1] && map[i + 1][j - 1].lei) map[i + 1][j - 1].num++;
+                        if (map[i + 1][j] && map[i + 1][j].lei) map[i + 1][j].num++;
+                        if (map[i + 1][j + 1] && map[i + 1][j + 1].lei) map[i + 1][j + 1].num++;
+                    }
+                }
+            }
+        }
+    }
+
+    function showTable(elm) {  //左键:点亮部分表格
+        //    是雷:标红,游戏结束
+        //    不是雷:
+        if (!elm.className) {
+            if (elm.lei) {
+                $(elm).css("background-color", "red")
+            } else {
+                $(elm).css("background-color", "white")
+            }
+        }
+        console.log(elm);
+
+    }
+
+
+    function flagThunder(elm) { //右键:标记 
+        //正确:雷数减少;全部正确,通关
+        //点击一次标记,再点击去除标记
+        if (elm.className) {
+            elm.classList.add("flag");
+        }
+        GameSuccess();
+    }
+
+    function click() {
+        $("#table td").mousedown(function (e) {
+            console.log(e.which);
+            if (1 == e.which) { //左键为1
+                showTable(this);
+                console.log(this);
+            }
+            else if (3 == e.which) { //右键为3
+                flagThunder(this);
+            }
+        });
+    }
+
+    function GameSuccess() {
+        alert("通关");
+    }
+
+    function GameFaliure() {
+        // clearInterval(setTime);
+        // setTimeout(function(){
+        alert("游戏失败");
+        // },500)
     }
 </script>
 
