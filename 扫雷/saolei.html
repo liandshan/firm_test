@@ -34,7 +34,7 @@
                 <table>
                     <tbody>
                         <tr>
-                            <td id="colCon">123</td>
+                            <td id="colCon" num="0" flag="false" lei="false">123</td>
                             <td>2</td>
                             <td>3</td>
                         </tr>
@@ -106,27 +106,44 @@
 </style>
 
 <script>
+    //埋雷那循环有问题,左键点亮，右键
     // 1.时间计时器
     // 2.随机插入雷
     // 3.点击随机点亮一些表格
     // 4.展现雷数
     // 5.标记雷
-    var rows = $("#rowNum").val() || 10; //行数
-    var cols = $("#columnNum").val() || 10;//列数
-    var thunders = $("#thunderNum").val() || 10;//雷数
+     // $("#col" + arrayx[i] +""+ arrayy[i]).text("sdd");
+    var rows;
+    var cols;
+    var thunders;
     var array = []; //数组元素
-    // $(document).ready(function () {
-    //     var setTime = setInterval(function () {
-    //         useTime += 0.5;
-    //         time.innerHTML = parseInt(useTime) + 's';
-    //     }, 500)
-   
-    // });
+    var safeNum=0;
+    var thunderLeft = 0;
+    createTable();
+    addThunder();
+    console.log($("#table td"));
+    $(document).ready(function () {
+        //     var setTime = setInterval(function () {
+        //         useTime += 0.5;
+        //         time.innerHTML = parseInt(useTime) + 's';
+        //     }, 500)
+
+
+    });
+
+    function getValues() {
+        rows = $("#rowNum").val() || 10; //行数
+        cols = $("#columnNum").val() || 10;//列数
+        thunders = $("#thunderNum").val() || 10;//雷数
+    }
     function startGame() {
         alert("游戏开始");
+        getValues();
         createTable();
         addThunder();
-        console.log($("#table td"));
+        // createMap();                
+        // mapInBox();
+        // showLeaveLei();
     }
     // 输入框输入内容合理否的校验
     function createTable() {
@@ -136,8 +153,9 @@
             tableHtml += "<tr>";
             array[i] = [];
             for (j = 0; j < cols; j++) {
-                tableHtml += "<td></td>";
-                array[i][j] = { 'x': i, 'y': j, 'num': 0, 'flag': false, 'lei': false };
+                tableHtml += "<td id=" + i + '-' + j
+                               + ' num=' + 0 
+                               + ' flag=' + false + ' lei=' + false + " ></td>";
             }
             tableHtml += "</tr>";
         }
@@ -145,43 +163,44 @@
         $("#table").html("").append(tableHtml);
         click();//每个单元格添加鼠标点击事件
     }
-
+    
     // 埋雷
     function addThunder() {
-        alert("埋雷");
-        let i = 0;
+        alert("埋雷"+thunders);
+        let i = 0; //雷数计数
         while (i < thunders) {
-            var arrayx = parseInt(Math.random() * rows);   // 生成[0,max]的随机数  
-            var arrayy = parseInt(Math.random() * cols);
-            if (array[arrayx][arrayy].lei) { //有雷
-                return
+            var x = parseInt(Math.random() * rows);   // 埋雷坐标，生成[0,max]的随机数  
+            var y = parseInt(Math.random() * cols);
+            let id="#"+x+"-"+y
+            var flag=$(id).attr("lei");
+            if (flag) { //有雷
+                alert(flag)
+                return;
             } else {
-                array[arrayx][arrayy].lei = true;
+                $(id).attr("lei",true);
                 i++;
             }
-            // $("#col" + arrayx[i] +""+ arrayy[i]).text("sdd");
+            alert(i);
         }
+        countThunder();
     }
 
     // 统计雷数
     function countThunder() {
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols; j++) {
-                if (map[i][j].lei) {
-                    if (map[i - 1]) { //上
-                        if (map[i - 1][j - 1] && map[i - 1][j - 1].lei) map[i - 1][j - 1].num++;
-                        if (map[i - 1][j] && map[i - 1][j].lei) map[i - 1][j].num++;
-                        if (map[i - 1][j + 1] && map[i - 1][j + 1].lei) map[i - 1][j + 1].num++;
-                    }
-                    if (map[i]) {
-                        if (map[i][j - 1] && map[i][j - 1].lei) map[i][j - 1].num++;
-                        if (map[i][j + 1] && map[i][j + 1].lei) map[i][j + 1].num++;
-                    }
-                    if (map[i + 1]) { //下
-                        if (map[i + 1][j - 1] && map[i + 1][j - 1].lei) map[i + 1][j - 1].num++;
-                        if (map[i + 1][j] && map[i + 1][j].lei) map[i + 1][j].num++;
-                        if (map[i + 1][j + 1] && map[i + 1][j + 1].lei) map[i + 1][j + 1].num++;
-                    }
+                let id="#"+i+"-"+j;
+                if ($(id).attr("lei")) {
+                    for(let x=rows-1;x<rows+2;x++){
+							for(let y=cols-1;y<cols+2;y++){
+                                if(x >=0 && y >=0 && x<rows && y<cols){//判断出画布大小
+                                    let aroundId="#"+x+"-"+y;
+		 							if (!$(aroundId).attr("lei")) {
+                                        $(aroundId).attr("num",$(aroundId).attr("num")++);
+                                     }
+		 						}
+							}
+						}
                 }
             }
         }
@@ -192,13 +211,30 @@
         //    不是雷:
         if (!elm.className) {
             if (elm.lei) {
-                $(elm).css("background-color", "red")
+                // $(elm).css("background-color", "red");
+                elm.classList.add("lei");
+                GameFaliure();
             } else {
-                $(elm).css("background-color", "white")
+                elm.classList.add("safe");
+                safeNum++;
+                if(elm.num!=0){
+                    $(elm).text(elm.num);
+                }else if (elm.num == 0){
+                    var axy= elm.id.split('-');
+                    var x=axy[0];
+                    var y=axy[1];
+                    for( var i = x - 1 ; i < x + 2; i ++){
+                        for(var j = y - 1; j < y + 2;j ++){
+                            var arr = [i,j];
+                            if(mysaolei.children[i*col + j] && (mysaolei.children[i*col + j].index[0] == arr[0] && mysaolei.children[i*col + j].index[1] == arr[1])){
+                                leftClick(mysaolei.children[i*col + j]);
+                            }
+                        }
+                    }
+                }
             }
         }
-        console.log(elm);
-
+        // GameSuccess();
     }
 
 
@@ -225,6 +261,7 @@
     }
 
     function GameSuccess() {
+        //验证通关否
         alert("通关");
     }
 
