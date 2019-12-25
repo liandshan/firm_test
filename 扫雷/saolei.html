@@ -31,20 +31,9 @@
 
             <div class="table" id="table">
                 <!-- 2行3列 -->
-                <table>
-                    <tbody>
-                        <tr>
-                            <td id="colCon" num="0" flag="false" lei="false">123</td>
-                            <td>2</td>
-                            <td>3</td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div id="colCon" num="0" flag="false" lei="false">12</div>
+                <div id="colCon1" num="0" flag="false" lei="false">1</div>
+                <div id="colCon2" num="0" flag="false" lei="false">1</div>
             </div>
         </div>
     </div>
@@ -84,7 +73,8 @@
         position: relative;
     }
 
-    .table tr td {
+    .table div {
+        position: absolute;
         border: 1px solid black;
         width: 20px;
         height: 20px;
@@ -92,43 +82,40 @@
         background-color: green;
     }
 
-    .table tr td.lei {
+    .table div.lei {
         background-color: red;
     }
 
-    .table tr td.flag {
+    .table div.flag {
         background-color: yellow;
     }
 
-    .table tr td.safe {
+    .table div.safe {
         background-color: white;
     }
 </style>
 
 <script>
-    //埋雷那循环有问题,左键点亮，右键
+    //,左键点亮，右键
     // 1.时间计时器
     // 2.随机插入雷
     // 3.点击随机点亮一些表格
     // 4.展现雷数
     // 5.标记雷
-     // $("#col" + arrayx[i] +""+ arrayy[i]).text("sdd");
+    // $("#col" + arrayx[i] +""+ arrayy[i]).text("sdd");
     var rows;
     var cols;
     var thunders;
-    var array = []; //数组元素
-    var safeNum=0;
-    var thunderLeft = 0;
-    createTable();
-    addThunder();
-    console.log($("#table td"));
+    var thunderFlag = 0;//雷标记数
+    var rightFlag = 0; //正确标记数
+    var map = []; //数组元素
+    var safeNum = 0; //安全区数量
+
+    // console.log($("#table td"));
     $(document).ready(function () {
-        //     var setTime = setInterval(function () {
-        //         useTime += 0.5;
-        //         time.innerHTML = parseInt(useTime) + 's';
-        //     }, 500)
-
-
+        // getValues();
+        // init();
+        alert($("colCon").lei());
     });
 
     function getValues() {
@@ -139,135 +126,190 @@
     function startGame() {
         alert("游戏开始");
         getValues();
+        init();
+    }
+
+    function init() {
         createTable();
-        addThunder();
+        showTable();
         // createMap();                
         // mapInBox();
-        // showLeaveLei();
+        showLeaveLei();
     }
     // 输入框输入内容合理否的校验
     function createTable() {
-        $("#table").bind("contextmenu", function () { return false; }) //先要屏蔽浏览器默认的右键点击行为，即阻止弹出框。
-        let tableHtml = "<table>";
-        for (i = 0; i < rows; i++) {
-            tableHtml += "<tr>";
-            array[i] = [];
-            for (j = 0; j < cols; j++) {
-                tableHtml += "<td id=" + i + '-' + j
-                               + ' num=' + 0 
-                               + ' flag=' + false + ' lei=' + false + " ></td>";
+        for (var i = 0; i < rows; i++) {
+            map[i] = [];
+            for (var j = 0; j < cols; j++) {
+                map[i][j] = { 'x': i, 'y': j, 'num': 0, 'flag': false, 'lei': false }
             }
-            tableHtml += "</tr>";
         }
-        tableHtml += "</table>";
-        $("#table").html("").append(tableHtml);
-        click();//每个单元格添加鼠标点击事件
-    }
-    
-    // 埋雷
-    function addThunder() {
-        alert("埋雷"+thunders);
-        let i = 0; //雷数计数
-        while (i < thunders) {
-            var x = parseInt(Math.random() * rows);   // 埋雷坐标，生成[0,max]的随机数  
-            var y = parseInt(Math.random() * cols);
-            let id="#"+x+"-"+y
-            var flag=$(id).attr("lei");
-            if (flag) { //有雷
-                alert(flag)
-                return;
-            } else {
-                $(id).attr("lei",true);
-                i++;
-            }
-            alert(i);
-        }
+        addThunder();
         countThunder();
     }
 
-    // 统计雷数
-    function countThunder() {
-        for (i = 0; i < rows; i++) {
-            for (j = 0; j < cols; j++) {
-                let id="#"+i+"-"+j;
-                if ($(id).attr("lei")) {
-                    for(let x=rows-1;x<rows+2;x++){
-							for(let y=cols-1;y<cols+2;y++){
-                                if(x >=0 && y >=0 && x<rows && y<cols){//判断出画布大小
-                                    let aroundId="#"+x+"-"+y;
-		 							if (!$(aroundId).attr("lei")) {
-                                        $(aroundId).attr("num",$(aroundId).attr("num")++);
-                                     }
-		 						}
-							}
-						}
-                }
+    // 埋雷
+    function addThunder() {
+        let i = 0; //雷数计数
+        for (; ;) {
+            var x = parseInt(Math.random() * rows);   // 埋雷坐标，生成[0,max]的随机数  
+            var y = parseInt(Math.random() * cols);
+            if (i == thunders) {
+                return
+            } else if (!map[x][y].lei) {
+                map[x][y].lei = true;
+                i++;
             }
         }
     }
 
-    function showTable(elm) {  //左键:点亮部分表格
-        //    是雷:标红,游戏结束
-        //    不是雷:
-        if (!elm.className) {
-            if (elm.lei) {
-                // $(elm).css("background-color", "red");
-                elm.classList.add("lei");
-                GameFaliure();
-            } else {
-                elm.classList.add("safe");
-                safeNum++;
-                if(elm.num!=0){
-                    $(elm).text(elm.num);
-                }else if (elm.num == 0){
-                    var axy= elm.id.split('-');
-                    var x=axy[0];
-                    var y=axy[1];
-                    for( var i = x - 1 ; i < x + 2; i ++){
-                        for(var j = y - 1; j < y + 2;j ++){
-                            var arr = [i,j];
-                            if(mysaolei.children[i*col + j] && (mysaolei.children[i*col + j].index[0] == arr[0] && mysaolei.children[i*col + j].index[1] == arr[1])){
-                                leftClick(mysaolei.children[i*col + j]);
+
+    // 统计雷数
+    function countThunder() {
+        alert("统计雷数");
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                if (map[i][j].lei) { //有雷
+                    for (let x = rows - 1; x < rows + 2; x++) {
+                        for (let y = cols - 1; y < cols + 2; y++) {
+                            if (x >= 0 && y >= 0 && x < rows && y < cols) {//判断出画布大小
+                                if (!map[x][y].lei) {  //无雷
+                                    map[x][y].num++;
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        // GameSuccess();
     }
 
-
-    function flagThunder(elm) { //右键:标记 
-        //正确:雷数减少;全部正确,通关
-        //点击一次标记,再点击去除标记
-        if (elm.className) {
-            elm.classList.add("flag");
+    function showTable() {
+        $("#table").bind("contextmenu", function () { return false; }) //先要屏蔽浏览器默认的右键点击行为，即阻止弹出框。
+        $("#table").html("");
+        // $("#table").css("width",cols * 27 + 2 + 'px');
+        // $("#table").css("height",rows * 27 + 2 + 'px');
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                var temp = createSquare(map[i][j]);
+                $("#table").append(temp);
+            }
         }
-        GameSuccess();
+        click();
     }
+    function createSquare(map) {
+        var cell = document.createElement('div');
+        cell.style.top = map.x * 25 + (map.x + 1) * 2 + 'px';
+        cell.style.left = map.y * 25 + (map.y + 1) * 2 + 'px';
+        cell.num = map.num;
+        cell.flag = map.flag;
+        cell.lei = map.lei;
+        cell.index = [map.x, map.y];
+        cell.eq = map.x * rows + map.y;
+        return cell;
+    }
+    //    
+    //     let tableHtml = "<table>";
+    //     for (i = 0; i < rows; i++) {
+    //         tableHtml += "<tr>";
+    //         array[i] = [];
+    //         for (j = 0; j < cols; j++) {
+    //             tableHtml += "<td id=" + i + '-' + j
+    //                 + ' num=' + 0
+    //                 + ' flag=' + false + ' lei=' + false + " ></td>";
+    //         }
+    //         tableHtml += "</tr>";
+    //     }
+    //     tableHtml += "</table>";
+    //     $("#table").html("").append(tableHtml);
+    //     click();//每个单元格添加鼠标点击事件
+    // }
 
     function click() {
-        $("#table td").mousedown(function (e) {
+        $("#table div").mousedown(function (e) {
             console.log(e.which);
             if (1 == e.which) { //左键为1
-                showTable(this);
+                leftMouse(this);
                 console.log(this);
             }
             else if (3 == e.which) { //右键为3
-                flagThunder(this);
+                rightMouse(this);
             }
         });
     }
 
+
+    //左键:点亮部分表格
+    function leftMouse(elm) {
+        if (!elm.className) {
+            if (elm.lei) {  //    是雷:标红,游戏结束
+                elm.classList.add("lei");
+                GameFaliure();
+            } else {              //不是雷:
+                elm.classList.add("safe");
+                safeNum++;
+                if (elm.num != 0) {
+                    $(elm).text(elm.num);  //标上数字
+                } else if (elm.num == 0) {
+                    var x = elm.index[0];
+                    var y = elm.index[1];
+                    for (var i = x - 1; i < x + 2; i++) {
+                        for (var j = y - 1; j < y + 2; j++) {
+                            var arr = [i, j];
+                            if ($("#table").children[i * cols + j] && ($("#table").children[i * cols + j].index[0] == arr[0] && $("#table").children[i * cols + j].index[1] == arr[1])) {
+                                leftMouse($("#table").children[i * cols + j]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        GameSuccess();
+    }
+
+    //右键:标记 
+    function rightMouse(elm) {  //正确:雷数减少;全部正确,通关  //点击一次标记,再点击去除标记
+        if (elm.classList.contains("flag") || !elm.className) {
+            elm.classList.toggle("flag");
+            elm.flag = !elm.flag;  // 点一下标记,两下删除标记
+            thunderFlag = elm.flag ? thunderFlag + 1 : thunderFlag - 1; //标记,删除标记
+            if (thunders == thunderFlag) {  //全部标记,就统计正确标记数
+                for (var i = 0; i < $("#table").children.length; i++) {
+                    if (($("#table").children[i].flag + $("#table").children[i].lei) == 2) {  //已标记,且是雷
+                        rightFlag += 1;
+                    }
+                }
+                if (rightFlag != thunders) {  //正确标记<雷,清零
+                    rightFlag = 0
+                }
+            }
+        }
+        showLeaveLei();
+        GameSuccess();
+    }
+
+    function showLeaveLei() {
+        $("#thunderLeft").text(thunders - thunderFlag + "个");
+    }
+
     function GameSuccess() {
         //验证通关否
-        alert("通关");
+        if (rightFlag == thunders || safeNum == (rows * cols - thunders)) {
+            alert("通关");
+            map = [];
+            thunderFlag = 0;
+            safeNum = 0;
+            rightFlag = 0;
+        }
+
     }
 
     function GameFaliure() {
-        // clearInterval(setTime);
-        // setTimeout(function(){
+        for ( i = 0; i < $("#table").children.length; i++) {
+            if ($("#table").children[i].lei) {
+                $("#table").children[i].classList.add("lei");
+            }
+        }
         alert("游戏失败");
         // },500)
     }
