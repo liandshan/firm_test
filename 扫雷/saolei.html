@@ -110,12 +110,12 @@
     var rightFlag = 0; //正确标记数
     var map = []; //数组元素
     var safeNum = 0; //安全区数量
-
+    var mysaolei = document.getElementById("table")
     // console.log($("#table td"));
     $(document).ready(function () {
         // getValues();
         // init();
-        alert($("colCon").lei());
+      
     });
 
     function getValues() {
@@ -130,6 +130,10 @@
     }
 
     function init() {
+        map = [];
+        thunderFlag = 0;
+        safeNum = 0;
+        rightFlag = 0;
         createTable();
         showTable();
         // createMap();                
@@ -167,21 +171,36 @@
     // 统计雷数
     function countThunder() {
         alert("统计雷数");
-        for (i = 0; i < rows; i++) {
-            for (j = 0; j < cols; j++) {
-                if (map[i][j].lei) { //有雷
-                    for (let x = rows - 1; x < rows + 2; x++) {
-                        for (let y = cols - 1; y < cols + 2; y++) {
-                            if (x >= 0 && y >= 0 && x < rows && y < cols) {//判断出画布大小
-                                if (!map[x][y].lei) {  //无雷
-                                    map[x][y].num++;
-                                }
-                            }
-                        }
-                    }
+        for(var i = 0; i < rows; i ++){            
+            for(var j = 0; j < cols; j ++){                
+                if(map[i][j].lei){   //有雷       
+                    if(map[i-1] && map[i-1][j-1] && !map[i-1][j-1].lei){map[i-1][j-1].num ++};
+                    if(map[i-1] && map[i-1][j]   && !map[i-1][j].lei  ){map[i-1][j].num ++};
+                    if(map[i-1] && map[i-1][j+1] && !map[i-1][j+1].lei){map[i-1][j+1].num ++};
+                    if(map[i]   && map[i][j-1]   && !map[i][j-1].lei  ){map[i][j-1].num ++};
+                    if(map[i]   && map[i][j+1]   && !map[i][j+1].lei  ){map[i][j+1].num ++};
+                    if(map[i+1] && map[i+1][j-1] && !map[i+1][j-1].lei){map[i+1][j-1].num ++};
+                    if(map[i+1] && map[i+1][j]   && !map[i+1][j].lei  ){map[i+1][j].num ++};
+                    if(map[i+1] && map[i+1][j+1] && !map[i+1][j+1].lei){map[i+1][j+1].num ++};
                 }
             }
         }
+        // for (i = 0; i < rows; i++) {
+        //     for (j = 0; j < cols; j++) {
+        //         if (map[i][j].lei) { //有雷
+        //             for (x = rows - 1; x < rows + 2; x++) {
+        //                 for ( y = cols - 1; y < cols + 2; y++) {
+        //                     if (x >= 0 && y >= 0 && x < rows && y < cols) {//判断出画布大小
+        //                         if (!map[x][y].lei) {  //无雷
+        //                             // console.log("无雷"+x+y);
+        //                             map[x][y].num++;
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     function showTable() {
@@ -256,8 +275,8 @@
                     for (var i = x - 1; i < x + 2; i++) {
                         for (var j = y - 1; j < y + 2; j++) {
                             var arr = [i, j];
-                            if ($("#table").children[i * cols + j] && ($("#table").children[i * cols + j].index[0] == arr[0] && $("#table").children[i * cols + j].index[1] == arr[1])) {
-                                leftMouse($("#table").children[i * cols + j]);
+                            if (mysaolei.children[i * cols + j] && (mysaolei.children[i * cols + j].index[0] == arr[0] && mysaolei.children[i * cols + j].index[1] == arr[1])) {
+                                leftMouse(mysaolei.children[i * cols + j]);
                             }
                         }
                     }
@@ -274,8 +293,8 @@
             elm.flag = !elm.flag;  // 点一下标记,两下删除标记
             thunderFlag = elm.flag ? thunderFlag + 1 : thunderFlag - 1; //标记,删除标记
             if (thunders == thunderFlag) {  //全部标记,就统计正确标记数
-                for (var i = 0; i < $("#table").children.length; i++) {
-                    if (($("#table").children[i].flag + $("#table").children[i].lei) == 2) {  //已标记,且是雷
+                for (i = 0; i < mysaolei.children.length; i++) {
+                    if ((mysaolei.children[i].flag + mysaolei.children[i].lei) == 2) {  //已标记,且是雷
                         rightFlag += 1;
                     }
                 }
@@ -305,9 +324,12 @@
     }
 
     function GameFaliure() {
-        for ( i = 0; i < $("#table").children.length; i++) {
-            if ($("#table").children[i].lei) {
-                $("#table").children[i].classList.add("lei");
+        // $("#table").children.length，
+        //jquery取children结果不正确！！！！,导致：左键自动展开，游戏失败验证，右键标雷验证失败
+        // $("#table").children[i].lei
+        for ( i = 0; i <mysaolei.children.length; i++) {
+            if (mysaolei.children[i].lei) {
+                mysaolei.children[i].classList.add("lei");
             }
         }
         alert("游戏失败");
