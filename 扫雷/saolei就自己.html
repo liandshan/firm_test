@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>扫雷游戏</title>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+    <script src='main.js'></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="left">
+                行数:<input id="rowNum" style="width: 100px;" placeholder="默认为10" value=""><br>
+                列数:<input id="columnNum" style="width: 100px;" placeholder="默认为10" value=""><br>
+                雷数:<input id="thunderNum" style="width: 100px;" placeholder="默认为10" value=""><br>
+            </div>
+            <div class="center" style="float: inherit;">
+                <button type="submit" onclick="startGame()">开始游戏</button>
+            </div>
+            <div class="right" sty>
+                时间<span id="time"></span><br>
+                剩余雷数<span id="thunderLeft"></span>
+            </div>
+        </div>
+        <div class="content">
+
+            <div class="table" id="table">
+                <!-- 2行3列 -->
+                <table>
+                    <tbody>
+                        <tr>
+                            <td id="colCon" num="0" flag="false" lei="false">123</td>
+                            <td>2</td>
+                            <td>3</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<style>
+    .header {
+        border: 1px solid;
+        margin: 30px 50px;
+        position: relative;
+        height: 100px;
+    }
+
+    .left {
+        font-weight: 1000;
+        float: left;
+        margin: 15px 25px;
+    }
+
+    .center {
+        color: red;
+        left: 50%;
+        position: absolute;
+        margin-top: 10px;
+    }
+
+    .right {
+        float: right;
+        margin-right: 200px;
+        margin-top: 20px;
+    }
+
+    .content {
+        border: 1px solid gray;
+        padding: 10px 10px;
+        width: max-content;
+        left: 50%;
+        position: relative;
+    }
+
+    .table tr td {
+        border: 1px solid black;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        background-color: green;
+    }
+
+    .table tr td.lei {
+        background-color: red;
+    }
+
+    .table tr td.flag {
+        background-color: yellow;
+    }
+
+    .table tr td.safe {
+        background-color: white;
+    }
+</style>
+
+<script>
+    //埋雷那循环有问题,左键点亮，右键
+    // 1.时间计时器
+    // 2.随机插入雷
+    // 3.点击随机点亮一些表格
+    // 4.展现雷数
+    // 5.标记雷
+     // $("#col" + arrayx[i] +""+ arrayy[i]).text("sdd");
+    var rows;
+    var cols;
+    var thunders;
+    var array = []; //数组元素
+    var safeNum=0;
+    var thunderLeft = 0;
+    createTable();
+    addThunder();
+    console.log($("#table td"));
+    $(document).ready(function () {
+        //     var setTime = setInterval(function () {
+        //         useTime += 0.5;
+        //         time.innerHTML = parseInt(useTime) + 's';
+        //     }, 500)
+
+
+    });
+
+    function getValues() {
+        rows = $("#rowNum").val() || 10; //行数
+        cols = $("#columnNum").val() || 10;//列数
+        thunders = $("#thunderNum").val() || 10;//雷数
+    }
+    function startGame() {
+        alert("游戏开始");
+        getValues();
+        createTable();
+        addThunder();
+        // createMap();                
+        // mapInBox();
+        // showLeaveLei();
+    }
+    // 输入框输入内容合理否的校验
+    function createTable() {
+        $("#table").bind("contextmenu", function () { return false; }) //先要屏蔽浏览器默认的右键点击行为，即阻止弹出框。
+        let tableHtml = "<table>";
+        for (i = 0; i < rows; i++) {
+            tableHtml += "<tr>";
+            array[i] = [];
+            for (j = 0; j < cols; j++) {
+                tableHtml += "<td id=" + i + '-' + j
+                               + ' num=' + 0 
+                               + ' flag=' + false + ' lei=' + false + " ></td>";
+            }
+            tableHtml += "</tr>";
+        }
+        tableHtml += "</table>";
+        $("#table").html("").append(tableHtml);
+        click();//每个单元格添加鼠标点击事件
+    }
+    
+    // 埋雷
+    function addThunder() {
+        alert("埋雷"+thunders);
+        let i = 0; //雷数计数
+        while (i < thunders) {
+            var x = parseInt(Math.random() * rows);   // 埋雷坐标，生成[0,max]的随机数  
+            var y = parseInt(Math.random() * cols);
+            let id="#"+x+"-"+y
+            var flag=$(id).attr("lei");
+            if (flag) { //有雷
+                alert(flag)
+                return;
+            } else {
+                $(id).attr("lei",true);
+                i++;
+            }
+            alert(i);
+        }
+        countThunder();
+    }
+
+    // 统计雷数
+    function countThunder() {
+        for (i = 0; i < rows; i++) {
+            for (j = 0; j < cols; j++) {
+                let id="#"+i+"-"+j;
+                if ($(id).attr("lei")) {
+                    for(let x=rows-1;x<rows+2;x++){
+							for(let y=cols-1;y<cols+2;y++){
+                                if(x >=0 && y >=0 && x<rows && y<cols){//判断出画布大小
+                                    let aroundId="#"+x+"-"+y;
+		 							if (!$(aroundId).attr("lei")) {
+                                        $(aroundId).attr("num",$(aroundId).attr("num")++);
+                                     }
+		 						}
+							}
+						}
+                }
+            }
+        }
+    }
+
+    function showTable(elm) {  //左键:点亮部分表格
+        //    是雷:标红,游戏结束
+        //    不是雷:
+        if (!elm.className) {
+            if (elm.lei) {
+                // $(elm).css("background-color", "red");
+                elm.classList.add("lei");
+                GameFaliure();
+            } else {
+                elm.classList.add("safe");
+                safeNum++;
+                if(elm.num!=0){
+                    $(elm).text(elm.num);
+                }else if (elm.num == 0){
+                    var axy= elm.id.split('-');
+                    var x=axy[0];
+                    var y=axy[1];
+                    for( var i = x - 1 ; i < x + 2; i ++){
+                        for(var j = y - 1; j < y + 2;j ++){
+                            var arr = [i,j];
+                            if(mysaolei.children[i*col + j] && (mysaolei.children[i*col + j].index[0] == arr[0] && mysaolei.children[i*col + j].index[1] == arr[1])){
+                                leftClick(mysaolei.children[i*col + j]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // GameSuccess();
+    }
+
+
+    function flagThunder(elm) { //右键:标记 
+        //正确:雷数减少;全部正确,通关
+        //点击一次标记,再点击去除标记
+        if (elm.className) {
+            elm.classList.add("flag");
+        }
+        GameSuccess();
+    }
+
+    function click() {
+        $("#table td").mousedown(function (e) {
+            console.log(e.which);
+            if (1 == e.which) { //左键为1
+                showTable(this);
+                console.log(this);
+            }
+            else if (3 == e.which) { //右键为3
+                flagThunder(this);
+            }
+        });
+    }
+
+    function GameSuccess() {
+        //验证通关否
+        alert("通关");
+    }
+
+    function GameFaliure() {
+        // clearInterval(setTime);
+        // setTimeout(function(){
+        alert("游戏失败");
+        // },500)
+    }
+</script>
+
+</html>
