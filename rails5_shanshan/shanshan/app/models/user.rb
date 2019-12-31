@@ -6,16 +6,12 @@
 
 class User < ApplicationRecord
   validates :username,uniqueness: {message: '用户名已存在'}
+ 
 
-  has_many:orders,dependent: :destroy
+  has_many :orders,dependent: :destroy
 
   VIP_USER = ["tom"]
   def is_vip?
-    VIP_USER.each do |s|
-       if s== self.username
-        return true 
-       end
-    end
-    return false 
+    VIP_USER.include?(self.username)
   end
 end

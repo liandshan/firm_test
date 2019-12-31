@@ -25,6 +25,8 @@ class OrdersController < ApplicationController
 
   # POST /orders
   # POST /orders.json
+  # 使用post请求提示：Can't verify CSRF token authenticity
+  skip_before_action :verify_authenticity_token
   def create
     @order = Order.new(params_hash)
     
@@ -63,8 +65,13 @@ class OrdersController < ApplicationController
     end
   end
 
+  # 统计所有商品分类的总销售额
   def category_report
-    @orders = Order.all(:select => "SUM(order_production.price) as total_sales, order_production.category_name as category_name").group_by(:product_id)
+    @total =Order.joins(:product).group(:category).select("category,sum(price*num) as totalPrice")
+    # respond_to do |format|
+    #   format.html { redirect_to orders_url, notice: 'Order was successfully' }
+    #   format.json { render :show, status: :ok, location: @total }
+    # end
   end
 
   private

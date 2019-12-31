@@ -7,7 +7,7 @@
 # updated_at	datetime	
 
 class Product < ApplicationRecord
-  has_many:orders
+  has_many :orders
 
   CATEGORY = [["笔记本",1],["PC主板",2],["手机",3],["平板",4]]
 
@@ -19,10 +19,9 @@ class Product < ApplicationRecord
 
   # 返回一个价格
   def promote_price
+    # "2019-11-11 12:22:05 +0800 ".to_time
       time=Time.now
-      if time.month==11 && time.day==11
-        return self.price*0.8 
-      end
+      return self.price*0.8 if time.month==11 && time.day==11
       return self.price
   end
 end
